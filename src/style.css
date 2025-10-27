@@ -1,0 +1,88 @@
+/* Global Styles */
+[v-cloak] { 
+  display: none; 
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: max(884px, 100dvh);
+  font-family: "Epilogue", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure router links are clickable */
+a {
+  text-decoration: none;
+  pointer-events: auto !important;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+}
+
+/* Custom styles for reservation form */
+.form-input-reservations {
+    background-color: #FDF5E6;
+    border: 1px solid #E0E0E0;
+    color: #333333;
+}
+
+.dark .form-input-reservations {
+    background-color: #424242;
+    border-color: #616161;
+    color: #f8f7f6;
+}
+
+.form-input-reservations:focus {
+    border-color: #FFC300;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 195, 0, 0.1);
+}
+
+.form-label-reservations {
+    color: #5D4037;
+}
+
+.dark .form-label-reservations {
+    color: #f8f7f6;
+}
+
+.btn-reservations {
+    background-color: #FFC300;
+    color: #5D4037;
+}
+
+/* Color variables */
+.bg-primary { background-color: #ec7f13 !important; }
+.text-primary { color: #ec7f13 !important; }
+.hover\:text-primary:hover { color: #ec7f13 !important; }
+.border-b-primary { border-bottom-color: #ec7f13 !important; }
+.bg-primary\/90 { background-color: rgba(236, 127, 19, 0.9) !important; }
+.hover\:bg-primary\/90:hover { background-color: rgba(236, 127, 19, 0.9) !important; }
+
+.bg-background-light { background-color: #f8f7f6; }
+.bg-background-dark { background-color: #221910; }
+.text-text-light { color: #181411; }
+.text-text-dark { color: #f8f7f6; }
+.bg-secondary { background-color: #5D4037; }
+.text-secondary { color: #5D4037; }
+
+.dark .bg-background-light { background-color: #221910; }
+.dark .bg-background-dark { background-color: #221910; }
+.dark .text-text-light { color: #f8f7f6; }
+.dark .text-text-dark { color: #f8f7f6; }
