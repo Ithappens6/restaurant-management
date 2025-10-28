@@ -1,11 +1,20 @@
 """
 Reservation Service - Business Logic Layer
-Handles reservation-related business operations
+Handles reservation-related business operations including:
+- Validation of reservation data
+- Date/time format checking
+- Email notifications
+- Repository interaction
 """
+from typing import Optional
+import logging
 from app.models import Reservation
 from app.repositories import IReservationRepository
 from app.schemas import ReservationCreate, ReservationConfirmation
 from datetime import datetime
+
+# Configure logger for this module
+logger = logging.getLogger(__name__)
 
 
 class ReservationService:
@@ -14,28 +23,51 @@ class ReservationService:
     Contains business logic for handling reservations
     """
     
-    def __init__(self, reservation_repository: IReservationRepository):
+    def __init__(self, reservation_repository: IReservationRepository, email_service=None):
+        """
+        Initialize reservation service with repository and optional email service
+        
+        Args:
+            reservation_repository: Data access layer for reservations
+            email_service: Optional service for sending confirmation emails
+        """
         self._repository = reservation_repository
+        self.email_service = email_service
+        logger.info("Reservation service initialized")
     
     def create_reservation(self, restaurant_id: str, reservation_data: ReservationCreate) -> ReservationConfirmation:
         """
-        Create a new reservation
-        Includes business logic validation
+        Create a new reservation with validation
+        
+        Args:
+            restaurant_id: ID of the restaurant
+            reservation_data: Reservation details from customer
+            
+        Returns:
+            ReservationConfirmation with success status and reservation ID
+            
+        Raises:
+            ValueError: If validation fails (invalid date/time format, past date)
         """
+        logger.info(f"📝 Creating reservation for {reservation_data.name}, party of {reservation_data.party_size}")
+        
         # Validate reservation date is not in the past
         try:
             reservation_date = datetime.strptime(reservation_data.date, "%Y-%m-%d")
             if reservation_date.date() < datetime.now().date():
+                logger.warning(f"❌ Rejected past date reservation: {reservation_data.date}")
                 raise ValueError("Cannot make reservations for past dates")
         except ValueError as e:
             if "does not match format" in str(e):
+                logger.error(f"❌ Invalid date format: {reservation_data.date}")
                 raise ValueError("Invalid date format. Use YYYY-MM-DD")
             raise
         
-        # Validate time format
+        # Validate time format (24-hour HH:MM)
         try:
             datetime.strptime(reservation_data.time, "%H:%M")
         except ValueError:
+            logger.error(f"❌ Invalid time format: {reservation_data.time}")
             raise ValueError("Invalid time format. Use HH:MM (24-hour format)")
         
         # Create reservation entity
@@ -51,12 +83,31 @@ class ReservationService:
             special_requests=reservation_data.special_requests,
         )
         
-        # Save reservation
+        # Save reservation to database
         saved_reservation = self._repository.create(reservation)
+        logger.info(f"✅ Reservation saved: ID={saved_reservation.id}")
+        
+        # Send confirmation email (non-blocking - don't fail reservation if email fails)
+        if self.email_service:
+            try:
+                logger.info(f"📧 Sending confirmation email to {reservation_data.email}")
+                self.email_service.send_reservation_confirmation(
+                    to_email=reservation_data.email,
+                    name=reservation_data.name,
+                    date=reservation_data.date,
+                    time=reservation_data.time,
+                    party_size=reservation_data.party_size,
+                    reservation_id=saved_reservation.id,
+                    special_requests=reservation_data.special_requests
+                )
+                logger.info("✅ Confirmation email sent successfully")
+            except Exception as e:
+                # Log error but don't fail the reservation (email is non-critical)
+                logger.error(f"⚠️  Failed to send confirmation email: {str(e)}", exc_info=True)
         
         return ReservationConfirmation(
             success=True,
-            message="Reservation confirmed! See you soon.",
+            message="Reservation confirmed! Check your email for details.",
             reservation_id=saved_reservation.id
         )
     

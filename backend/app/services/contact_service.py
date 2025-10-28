@@ -2,6 +2,7 @@
 Contact Service - Business Logic Layer
 Handles contact form submissions
 """
+from typing import Optional
 from app.models import ContactMessage
 from app.repositories import IContactRepository
 from app.schemas import ContactFormSubmit, ContactFormResponse
@@ -13,8 +14,9 @@ class ContactService:
     Contains business logic for handling contact messages
     """
     
-    def __init__(self, contact_repository: IContactRepository):
+    def __init__(self, contact_repository: IContactRepository, email_service=None):
         self._repository = contact_repository
+        self.email_service = email_service
     
     def submit_contact_form(self, restaurant_id: str, form_data: ContactFormSubmit) -> ContactFormResponse:
         """
@@ -34,14 +36,25 @@ class ContactService:
         # Save message
         saved_message = self._repository.create(message)
         
-        # In a real application, you might:
-        # - Send an email to the restaurant
-        # - Send a confirmation email to the customer
-        # - Trigger a notification to staff
+        # Send notification email to restaurant (non-blocking - don't fail if email fails)
+        if self.email_service:
+            try:
+                # Format phone number - handle both with and without phone field
+                phone = getattr(form_data, 'phone', 'Not provided')
+                
+                self.email_service.send_contact_form_notification(
+                    customer_name=form_data.name,
+                    customer_email=form_data.email,
+                    customer_phone=phone,
+                    message_text=f"Subject: {form_data.subject}\n\n{form_data.message}"
+                )
+            except Exception as e:
+                # Log error but don't fail the form submission
+                print(f"⚠️  Failed to send contact form notification: {str(e)}")
         
         return ContactFormResponse(
             success=True,
-            message="Message sent! We will get back to you."
+            message="Message sent! We will get back to you soon."
         )
     
     def get_all_messages(self):

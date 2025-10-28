@@ -2,7 +2,7 @@
 SQLAlchemy Database Models
 Defines the database schema for persistent storage
 """
-from sqlalchemy import Column, String, Integer, Text, DateTime, Index
+from sqlalchemy import Column, String, Integer, Text, DateTime, Float, Boolean, JSON, Index
 from datetime import datetime
 from .base import Base
 
@@ -129,3 +129,124 @@ class ChatMessageModel(Base):
     
     def __repr__(self):
         return f"<ChatMessage(id={self.id}, session={self.session_id}, role={self.role})>"
+
+
+class RestaurantModel(Base):
+    """
+    Database model for restaurant information
+    """
+    __tablename__ = "restaurants"
+    
+    # Primary Key
+    id = Column(String(100), primary_key=True, index=True)
+    
+    # Basic Information
+    name = Column(String(200), nullable=False)
+    slug = Column(String(200), unique=True, nullable=False, index=True)
+    tagline = Column(String(300))
+    
+    # Contact Information
+    address = Column(String(300))
+    phone = Column(String(20))
+    email = Column(String(100))
+    
+    # Media URLs
+    logo_url = Column(Text)
+    hero_image_url = Column(Text)
+    about_image_url = Column(Text)
+    owner_image_url = Column(Text)
+    
+    # About Section
+    story = Column(Text)
+    cuisine_type = Column(String(100))
+    owner_name = Column(String(100))
+    owner_bio = Column(Text)
+    
+    # Business Hours (JSON format)
+    # Example: {"0": null, "1": [11, 21], "2": [11, 21], ...}
+    business_hours = Column(JSON)
+    
+    # Settings
+    is_active = Column(Boolean, default=True)
+    accepts_reservations = Column(Boolean, default=True)
+    
+    # Metadata
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    
+    def __repr__(self):
+        return f"<Restaurant(id={self.id}, name={self.name})>"
+
+
+class MenuItemModel(Base):
+    """
+    Database model for menu items
+    """
+    __tablename__ = "menu_items"
+    
+    # Primary Key
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    
+    # Restaurant Association
+    restaurant_id = Column(String(100), nullable=False, index=True)
+    
+    # Item Information
+    name = Column(String(200), nullable=False)
+    description = Column(Text)
+    price = Column(Float, nullable=False)
+    
+    # Category and Tags
+    category = Column(String(50), nullable=False)  # e.g., "appetizers", "signature_dishes"
+    tags = Column(JSON)  # List of dietary tags: ["vegetarian", "gluten_free"]
+    
+    # Media
+    image = Column(Text)
+    
+    # Display Settings
+    is_available = Column(Boolean, default=True)
+    display_order = Column(Integer, default=0)
+    
+    # Metadata
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    
+    # Indexes
+    __table_args__ = (
+        Index('ix_restaurant_category', 'restaurant_id', 'category'),
+        Index('ix_restaurant_available', 'restaurant_id', 'is_available'),
+    )
+    
+    def __repr__(self):
+        return f"<MenuItem(id={self.id}, name={self.name}, restaurant={self.restaurant_id})>"
+
+
+class SystemPromptCacheModel(Base):
+    """
+    Database model for cached system prompts
+    Stores pre-built prompts for each restaurant to improve performance
+    """
+    __tablename__ = "system_prompt_cache"
+    
+    # Primary Key
+    restaurant_id = Column(String(100), primary_key=True, index=True)
+    
+    # Cached Prompt (can be very large - SQLite TEXT supports up to 1GB)
+    prompt_text = Column(Text, nullable=False)
+    
+    # Versioning
+    version = Column(Integer, default=1, nullable=False)
+    
+    # Metadata flags
+    includes_menu = Column(Boolean, default=True)
+    includes_hours = Column(Boolean, default=True)
+    includes_about = Column(Boolean, default=True)
+    
+    # Token count estimate (for monitoring)
+    estimated_tokens = Column(Integer, nullable=True)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    
+    def __repr__(self):
+        return f"<SystemPromptCache(restaurant_id={self.restaurant_id}, version={self.version})>"
