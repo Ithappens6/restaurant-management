@@ -24,7 +24,14 @@
           </p>
         </div>
         <div class="shrink-0">
-          <button class="text-base font-medium leading-normal text-primary hover:underline">Get directions</button>
+          <a 
+            href="https://www.google.com/maps/search/?api=1&query=1337+N+Spice+Rd+Prescott+Valley+AZ+86314" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="text-base font-medium leading-normal text-primary hover:underline"
+          >
+            Get directions
+          </a>
         </div>
       </div>
       
@@ -38,7 +45,12 @@
           </p>
         </div>
         <div class="shrink-0">
-          <button class="text-base font-medium leading-normal text-primary hover:underline">Call</button>
+          <a 
+            href="tel:+19285551337" 
+            class="text-base font-medium leading-normal text-primary hover:underline"
+          >
+            Call
+          </a>
         </div>
       </div>
       

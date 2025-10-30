@@ -21,7 +21,7 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
-        "https://a8181d952605.ngrok-free.app"
+        "https://82126dd095b3.ngrok-free.app"
     ]
     
     # Restaurant Information
@@ -44,6 +44,15 @@ class Settings(BaseSettings):
     # OpenAI Configuration
     openai_api_key: str = ""
     openai_model: str = "gpt-4.1-mini"
+    
+    # SendGrid Email Configuration
+    sendgrid_api_key: str = ""
+    sendgrid_from_email: str = "noreply@localhost"
+    sendgrid_from_name: str = "Restaurant"
+    restaurant_notification_email: str = "admin@localhost"
+    
+    # Database Configuration (optional, can be handled elsewhere)
+    database_url: str = "sqlite:///./restaurant.db"
     
     class Config:
         env_file = ".env"

@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:staging": "vite --mode staging",
+    "dev:production": "vite --mode production",
     "build": "vite build",
+    "build:staging": "vite build --mode staging",
+    "build:production": "vite build --mode production",
     "preview": "vite preview"
   },
   "keywords": [
@@ -19,6 +23,8 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "dompurify": "^3.3.0",
+    "marked": "^16.4.1",
     "vue": "^3.4.0",
     "vue-router": "^4.2.0"
   },

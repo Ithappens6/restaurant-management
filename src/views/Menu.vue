@@ -74,7 +74,7 @@
                 <p class="text-text-light dark:text-text-dark font-bold mt-2">${{ item.price.toFixed(2) }}</p>
               </div>
               <div 
-                class="w-24 h-24 bg-center bg-no-repeat aspect-square bg-cover rounded-lg flex-shrink-0" 
+                class="w-32 h-32 bg-center bg-no-repeat aspect-square bg-cover rounded-lg flex-shrink-0" 
                 :style="{ 'background-image': `url(${item.image})` }"
               ></div>
             </div>

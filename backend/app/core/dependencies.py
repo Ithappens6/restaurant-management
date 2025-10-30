@@ -15,6 +15,7 @@ from app.services import (
     ContactService,
     RestaurantService,
 )
+from app.services.email_service import email_service
 from app.data import create_sample_restaurants
 from app.database import get_db
 
@@ -49,7 +50,7 @@ def get_restaurant_service() -> RestaurantService:
 
 def get_reservation_service(db: Session = None) -> ReservationService:
     """
-    Get reservation service instance with database session
+    Get reservation service instance with database session and email service
     
     Note: db parameter will be injected by FastAPI's Depends(get_db)
     """
@@ -59,12 +60,12 @@ def get_reservation_service(db: Session = None) -> ReservationService:
         db = SessionLocal()
     
     reservation_repository = SQLAlchemyReservationRepository(db)
-    return ReservationService(reservation_repository)
+    return ReservationService(reservation_repository, email_service)
 
 
 def get_contact_service(db: Session = None) -> ContactService:
     """
-    Get contact service instance with database session
+    Get contact service instance with database session and email service
     
     Note: db parameter will be injected by FastAPI's Depends(get_db)
     """
@@ -74,4 +75,4 @@ def get_contact_service(db: Session = None) -> ContactService:
         db = SessionLocal()
     
     contact_repository = SQLAlchemyContactRepository(db)
-    return ContactService(contact_repository)
+    return ContactService(contact_repository, email_service)

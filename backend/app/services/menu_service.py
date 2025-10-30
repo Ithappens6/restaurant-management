@@ -18,10 +18,14 @@ class MenuService:
     def __init__(self, restaurant_repository: IRestaurantRepository):
         self._restaurant_repo = restaurant_repository
     
-    def get_menu_grouped_by_category(self, restaurant_id: str) -> Optional[Dict[str, List[MenuItemResponse]]]:
+    def get_menu_grouped_by_category(self, restaurant_id: str, category_filter: Optional[str] = None) -> Optional[Dict[str, List[MenuItemResponse]]]:
         """
         Get menu organized by categories for a specific restaurant
         Returns data in the format expected by frontend
+        
+        Args:
+            restaurant_id: The restaurant identifier
+            category_filter: Optional category to filter by (e.g., 'signature_dishes')
         """
         restaurant = self._restaurant_repo.get_by_id(restaurant_id)
         if not restaurant:
@@ -53,6 +57,14 @@ class MenuService:
             category_key = item.category.value
             if category_key in grouped_menu:
                 grouped_menu[category_key].append(item_response)
+        
+        # If category filter is provided, return only that category
+        if category_filter:
+            if category_filter in grouped_menu:
+                return {category_filter: grouped_menu[category_filter]}
+            else:
+                # Return empty dict if category doesn't exist
+                return {}
         
         return grouped_menu
     

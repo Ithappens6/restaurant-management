@@ -16,16 +16,24 @@ const FETCH_CONFIG = {
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    'ngrok-skip-browser-warning': 'true',  // Skip ngrok browser warning page
   }
 }
 
 /**
  * GET Menu Data from API
+ * @param {string} category - Optional category filter (e.g., 'signature_dishes')
  * @returns {Promise<Object>} Menu data organized by categories
  */
-export async function fetchMenu() {
+export async function fetchMenu(category = null) {
   try {
-    const url = getRestaurantApiUrl('/menu')
+    let url = getRestaurantApiUrl('/menu')
+    
+    // Add category filter if provided
+    if (category) {
+      url += `?category=${encodeURIComponent(category)}`
+    }
+    
     console.log('🍽️ Fetching menu from:', url)
     
     const response = await fetch(url, {
@@ -47,6 +55,22 @@ export async function fetchMenu() {
     return data
   } catch (error) {
     console.error('Error fetching menu:', error)
+    throw error
+  }
+}
+
+/**
+ * GET Signature Dishes from API
+ * Convenience function to fetch only signature dishes
+ * @returns {Promise<Array>} Array of signature dish items
+ */
+export async function fetchSignatureDishes() {
+  try {
+    const data = await fetchMenu('signature_dishes')
+    // Return the array of items from the signature_dishes category
+    return data.signature_dishes || []
+  } catch (error) {
+    console.error('Error fetching signature dishes:', error)
     throw error
   }
 }
@@ -122,9 +146,9 @@ export async function getRestaurantStatus() {
     const data = await response.json()
     console.log('Restaurant status received:', data)
     
-    // Backend returns: { is_open: true/false, message: "..." }
+    // Backend returns: { isOpen: true/false, message: "..." }
     return {
-      isOpen: data.is_open,
+      isOpen: data.isOpen,
       message: data.message
     }
   } catch (error) {
@@ -244,8 +268,9 @@ export async function getRestaurantHours() {
  */
 export async function sendChatMessage(chatData) {
   try {
-    const url = 'http://localhost:8000/api/chat'
-    console.log('💬 Sending chat message:', chatData.message)
+    const url = getRestaurantApiUrl('/chat')
+    console.log('💬 Sending chat message to:', url)
+    console.log('💬 Message:', chatData.message)
     
     const response = await fetch(url, {
       ...FETCH_CONFIG,

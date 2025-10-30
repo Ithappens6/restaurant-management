@@ -11,12 +11,14 @@
  * - Stored in localStorage for multi-restaurant selection
  */
 
+import CONFIG from './env.config.js'
+
 export const RESTAURANT_CONFIG = {
   // Unique identifier for this restaurant (used in API calls)
-  restaurantId: 'kurdiescurry',
+  restaurantId: import.meta.env.VITE_RESTAURANT_ID || 'kurdiescurry',
   
-  // Backend API base URL
-  apiBaseUrl: 'http://localhost:8000/api',
+  // Backend API base URL (from environment config)
+  apiBaseUrl: CONFIG.apiBaseUrl,
   
   // Restaurant display information (can be fetched from API later)
   displayName: "Kurdie's Curry",

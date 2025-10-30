@@ -2,68 +2,32 @@
   <div class="relative flex flex-col w-full">
     <!-- Hero Section (Full Screen) -->
     <section class="relative flex h-screen w-full flex-col">
-      <!-- Desktop Header for Home Page -->
+      <!-- Header for Home Page -->
       <header class="absolute top-0 left-0 right-0 z-50 bg-transparent pointer-events-none">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-          <nav class="flex items-center justify-between py-6 pointer-events-auto">
-            <!-- Logo with Status -->
-            <div class="flex flex-col pointer-events-auto">
-              <div class="text-2xl font-bold text-white">Kurdie's Curry</div>
-              <!-- Restaurant Status Indicator -->
-              <div class="flex items-center gap-2 mt-1">
-                <div class="flex items-center gap-1.5">
-                  <span 
-                    class="w-2 h-2 rounded-full animate-pulse"
-                    :class="restaurantStatus.isOpen ? 'bg-green-500' : 'bg-red-500'"
-                  ></span>
-                  <span 
-                    class="text-xs font-semibold uppercase tracking-wide"
-                    :class="restaurantStatus.isOpen ? 'text-green-400' : 'text-red-400'"
-                  >
-                    {{ restaurantStatus.isOpen ? 'Open' : 'Closed' }}
-                  </span>
-                </div>
-                <span class="text-xs text-white/80">{{ restaurantStatus.message }}</span>
-              </div>
-            </div>
-            
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center space-x-8 pointer-events-auto">
-              <a href="#about" class="text-white hover:text-primary transition-colors px-3 py-2 cursor-pointer font-medium pointer-events-auto">About</a>
-              <a href="#contact" class="text-white hover:text-primary transition-colors px-3 py-2 cursor-pointer font-medium pointer-events-auto">Contact</a>
-            </div>
-            
-            <!-- Mobile Menu Button -->
-            <button 
-              @click="showMobileMenu = !showMobileMenu" 
-              class="md:hidden text-white cursor-pointer pointer-events-auto z-50 relative"
-            >
-              <span class="material-symbols-outlined">{{ showMobileMenu ? 'close' : 'menu' }}</span>
-            </button>
-          </nav>
-          
-          <!-- Mobile Menu Dropdown -->
-          <div 
-            v-if="showMobileMenu"
-            class="md:hidden absolute top-full left-0 right-0 bg-gray-900/95 backdrop-blur-sm pointer-events-auto"
-          >
-            <div class="flex flex-col py-4 px-4 space-y-2">
-              <a 
-                href="#about" 
-                @click="showMobileMenu = false"
-                class="text-white hover:text-primary transition-colors px-4 py-3 cursor-pointer font-medium rounded-lg hover:bg-white/10"
+          <nav class="flex items-center justify-center py-4 sm:py-6 pointer-events-auto">
+            <!-- Navigation Buttons (All Screen Sizes) -->
+            <div class="flex items-center space-x-3 sm:space-x-6 pointer-events-auto bg-black/30 backdrop-blur-md rounded-full px-4 sm:px-8 py-2 sm:py-3">
+              <button 
+                @click="scrollToSection('about')" 
+                class="text-white hover:text-primary transition-colors px-2 sm:px-4 py-2 cursor-pointer font-medium text-sm sm:text-base"
               >
                 About
-              </a>
-              <a 
-                href="#contact" 
-                @click="showMobileMenu = false"
-                class="text-white hover:text-primary transition-colors px-4 py-3 cursor-pointer font-medium rounded-lg hover:bg-white/10"
+              </button>
+              <button 
+                @click="scrollToSection('hours')" 
+                class="text-white hover:text-primary transition-colors px-2 sm:px-4 py-2 cursor-pointer font-medium text-sm sm:text-base"
+              >
+                Hours
+              </button>
+              <button 
+                @click="scrollToSection('contact')" 
+                class="text-white hover:text-primary transition-colors px-2 sm:px-4 py-2 cursor-pointer font-medium text-sm sm:text-base"
               >
                 Contact
-              </a>
+              </button>
             </div>
-          </div>
+          </nav>
         </div>
       </header>
       
@@ -80,12 +44,12 @@
               <h2 class="text-lg font-normal leading-normal md:text-xl">Authentic Flavors, Modern Twist</h2>
             </div>
             <div class="mt-8 flex flex-col sm:flex-row gap-4">
-              <router-link 
-                to="/menu" 
+              <button 
+                @click="scrollToSection('specialty-menu')"
                 class="flex min-w-[180px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors"
               >
                 <span class="truncate">View Menu</span>
-              </router-link>
+              </button>
               <router-link 
                 to="/reservations" 
                 class="flex min-w-[180px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-background-light text-gray-800 text-base font-bold leading-normal tracking-[0.015em] hover:bg-background-light/90 transition-colors"
@@ -150,6 +114,83 @@
 
         <!-- Scroll Down Indicator -->
         <div class="flex justify-center mt-12">
+          <a href="#specialty-menu" class="flex flex-col items-center text-text-light dark:text-text-dark hover:text-primary transition-colors">
+            <span class="text-sm mb-2">Our Menu</span>
+            <span class="material-symbols-outlined text-4xl animate-bounce">expand_more</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Specialty Menu Section -->
+    <section id="specialty-menu" class="bg-white dark:bg-gray-900 py-16">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-text-light dark:text-text-dark text-center mb-2">Our Signature Dishes</h2>
+        <p class="text-center text-gray-600 dark:text-gray-400 mb-8">Handcrafted specialties that define our cuisine</p>
+        
+        <!-- Loading State -->
+        <div v-if="isLoadingSignatureDishes" class="text-center py-8">
+          <p class="text-gray-600 dark:text-gray-400">Loading our specialties...</p>
+        </div>
+        
+        <!-- Error State -->
+        <div v-else-if="signatureDishesError" class="text-center py-8">
+          <p class="text-red-600">Failed to load signature dishes</p>
+        </div>
+        
+        <!-- Horizontal Scroll Container -->
+        <div v-else-if="signatureDishes.length > 0" class="relative">
+          <div 
+            ref="scrollContainer"
+            @mouseenter="pauseAutoScroll"
+            @mouseleave="resumeAutoScroll"
+            @touchstart="pauseAutoScroll"
+            @scroll="handleManualScroll"
+            class="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide scroll-smooth"
+          >
+            <div 
+              v-for="dish in signatureDishes" 
+              :key="dish.id"
+              class="flex-shrink-0 snap-start w-80"
+            >
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-shadow overflow-hidden group">
+                <div 
+                  class="w-full h-56 bg-center bg-cover"
+                  :style="{ 'background-image': `url(${dish.image})` }"
+                ></div>
+                <div class="p-4">
+                  <h3 class="text-lg font-bold text-text-light dark:text-text-dark mb-2">
+                    {{ dish.name }}
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                    {{ dish.description }}
+                  </p>
+                  <p class="text-xl font-bold text-primary">
+                    ${{ dish.price.toFixed(2) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div v-else class="text-center py-8">
+          <p class="text-gray-600 dark:text-gray-400">No signature dishes available</p>
+        </div>
+        
+        <!-- View Full Menu Button -->
+        <div class="text-center mt-8">
+          <router-link 
+            to="/menu" 
+            class="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            View Full Menu
+          </router-link>
+        </div>
+        
+        <!-- Scroll Down to Contact -->
+        <div class="flex justify-center mt-12">
           <a href="#contact" class="flex flex-col items-center text-text-light dark:text-text-dark hover:text-primary transition-colors">
             <span class="text-sm mb-2">Contact Us</span>
             <span class="material-symbols-outlined text-4xl animate-bounce">expand_more</span>
@@ -172,7 +213,7 @@
         
         <div class="grid md:grid-cols-2 gap-8 mb-12">
           <!-- Location Info -->
-          <div class="space-y-4">
+          <div id="hours" class="space-y-4">
             <h3 class="text-lg font-bold leading-tight tracking-[-0.015em] text-text-light dark:text-text-dark mb-4">
               Our Location & Hours
             </h3>
@@ -185,7 +226,14 @@
                 <p class="text-base font-normal leading-normal text-text-light dark:text-text-dark">
                   1337 N Spice Rd<br>Prescott Valley, AZ 86314
                 </p>
-                <button class="text-base font-medium leading-normal text-primary hover:underline mt-1">Get directions</button>
+                <a 
+                  href="https://www.google.com/maps/search/?api=1&query=1337+N+Spice+Rd+Prescott+Valley+AZ+86314" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="text-base font-medium leading-normal text-primary hover:underline mt-1 inline-block"
+                >
+                  Get directions
+                </a>
               </div>
             </div>
             
@@ -197,7 +245,12 @@
                 <p class="text-base font-normal leading-normal text-text-light dark:text-text-dark">
                   (928) 555-1337
                 </p>
-                <button class="text-base font-medium leading-normal text-primary hover:underline mt-1">Call</button>
+                <a 
+                  href="tel:+19285551337" 
+                  class="text-base font-medium leading-normal text-primary hover:underline mt-1 inline-block"
+                >
+                  Call
+                </a>
               </div>
             </div>
             
@@ -290,13 +343,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { submitContactForm, getRestaurantStatus } from '@/services/api'
-
-const showMobileMenu = ref(false)
-const restaurantStatus = ref({
-  isOpen: true,
-  message: 'Loading...'
-})
+import { submitContactForm, fetchSignatureDishes } from '@/services/api'
 
 const form = ref({
   name: '',
@@ -307,6 +354,45 @@ const form = ref({
 
 const status = ref(null)
 const isSubmitting = ref(false)
+
+// Signature dishes state
+const signatureDishes = ref([])
+const isLoadingSignatureDishes = ref(false)
+const signatureDishesError = ref(false)
+
+// Auto-scroll state
+const scrollContainer = ref(null)
+let autoScrollInterval = null
+let isAutoScrollPaused = false
+let manualScrollTimeout = null
+
+// Load signature dishes
+const loadSignatureDishes = async () => {
+  isLoadingSignatureDishes.value = true
+  signatureDishesError.value = false
+  
+  try {
+    const dishes = await fetchSignatureDishes()
+    signatureDishes.value = dishes
+    console.log('✨ Signature dishes loaded:', dishes)
+  } catch (error) {
+    console.error('Failed to load signature dishes:', error)
+    signatureDishesError.value = true
+  } finally {
+    isLoadingSignatureDishes.value = false
+  }
+}
+
+// Smooth scroll to section
+const scrollToSection = (sectionId) => {
+  const element = document.getElementById(sectionId)
+  if (element) {
+    element.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    })
+  }
+}
 
 const handleSubmit = async () => {
   status.value = null
@@ -333,36 +419,90 @@ const handleSubmit = async () => {
   }
 }
 
-// Fetch restaurant status on mount
-const fetchStatus = async () => {
-  try {
-    console.log('Fetching restaurant status...')
-    const statusData = await getRestaurantStatus()
-    restaurantStatus.value = statusData
-    console.log('Restaurant status updated:', statusData)
-  } catch (error) {
-    console.error('Failed to fetch restaurant status:', error)
-    // Default to open if API fails
-    restaurantStatus.value = {
-      isOpen: true,
-      message: 'Call us for hours'
+// Auto-scroll functions
+const startAutoScroll = () => {
+  if (!scrollContainer.value || signatureDishes.value.length <= 1) return
+  
+  autoScrollInterval = setInterval(() => {
+    if (isAutoScrollPaused) return
+    
+    const container = scrollContainer.value
+    const cardWidth = 320 + 24 // 80*4 (w-80) + 24 (gap-6)
+    const maxScroll = container.scrollWidth - container.clientWidth
+    
+    // If at the end, loop back to start
+    if (container.scrollLeft >= maxScroll - 10) {
+      container.scrollLeft = 0
+    } else {
+      // Scroll to next item
+      container.scrollLeft += cardWidth
     }
+  }, 2000) // Scroll every 2 seconds
+}
+
+const stopAutoScroll = () => {
+  if (autoScrollInterval) {
+    clearInterval(autoScrollInterval)
+    autoScrollInterval = null
   }
 }
 
-onMounted(() => {
-  fetchStatus()
-  // Update status every 5 minutes (300000ms)
-  const intervalId = setInterval(fetchStatus, 5 * 60 * 1000)
+const pauseAutoScroll = () => {
+  isAutoScrollPaused = true
+}
+
+const resumeAutoScroll = () => {
+  isAutoScrollPaused = false
+}
+
+const handleManualScroll = () => {
+  // Pause auto-scroll when user manually scrolls
+  isAutoScrollPaused = true
   
-  // Clean up interval on unmount
-  onUnmounted(() => {
-    clearInterval(intervalId)
-  })
+  // Clear existing timeout
+  if (manualScrollTimeout) {
+    clearTimeout(manualScrollTimeout)
+  }
+  
+  // Resume auto-scroll after 3 seconds of no manual interaction
+  manualScrollTimeout = setTimeout(() => {
+    isAutoScrollPaused = false
+  }, 3000)
+}
+
+// Load signature dishes on mount
+onMounted(() => {
+  loadSignatureDishes()
+  
+  // Start auto-scroll after dishes are loaded
+  setTimeout(() => {
+    if (signatureDishes.value.length > 1) {
+      startAutoScroll()
+    }
+  }, 1000)
+})
+
+// Cleanup on unmount
+onUnmounted(() => {
+  stopAutoScroll()
+  if (manualScrollTimeout) {
+    clearTimeout(manualScrollTimeout)
+  }
 })
 </script>
 
 <style scoped>
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
