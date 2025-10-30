@@ -20,6 +20,7 @@ def get_menu_service() -> MenuService:
 @router.get("", response_model=MenuResponse, summary="Get complete menu")
 async def get_menu(
     restaurant_id: str,
+    category: str = Query(None, description="Optional category filter (e.g., 'signature_dishes')"),
     service: MenuService = Depends(get_menu_service)
 ):
     """
@@ -33,8 +34,9 @@ async def get_menu(
     - desserts
     
     - **restaurant_id**: Unique restaurant identifier
+    - **category**: Optional - filter to return only one category
     """
-    menu_data = service.get_menu_grouped_by_category(restaurant_id)
+    menu_data = service.get_menu_grouped_by_category(restaurant_id, category_filter=category)
     if menu_data is None:
         raise HTTPException(status_code=404, detail="Restaurant not found")
     return MenuResponse(**menu_data)
