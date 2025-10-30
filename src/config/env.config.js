@@ -10,7 +10,7 @@
 
 const ENV = {
   development: {
-    apiBaseUrl: 'http://localhost:8000/api',
+    apiBaseUrl: 'https://82126dd095b3.ngrok-free.app/api',
     debug: true,
     enableMocks: false,
   },

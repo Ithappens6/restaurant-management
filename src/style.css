@@ -42,6 +42,18 @@ a:hover {
     color: #333333;
 }
 
+/* Remove default select arrow for all browsers */
+select.form-input-reservations {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none;
+}
+
+select.form-input-reservations::-ms-expand {
+    display: none; /* For IE11 */
+}
+
 .dark .form-input-reservations {
     background-color: #424242;
     border-color: #616161;

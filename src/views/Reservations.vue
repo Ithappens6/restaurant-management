@@ -48,7 +48,7 @@
               <div class="relative">
                 <select 
                   v-model="form.partySize" 
-                  class="form-select appearance-none w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 h-14 p-[15px] text-base font-normal leading-normal form-input-reservations" 
+                  class="appearance-none w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 h-14 p-[15px] pr-12 text-base font-normal leading-normal form-input-reservations" 
                   required
                 >
                   <option>1 person</option>
@@ -82,7 +82,7 @@
             <div class="relative">
               <select 
                 v-model="form.time" 
-                class="form-select appearance-none w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 h-14 p-[15px] text-base font-normal leading-normal form-input-reservations" 
+                class="appearance-none w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 h-14 p-[15px] pr-12 text-base font-normal leading-normal form-input-reservations" 
                 required
               >
                 <option>5:00 PM</option>
