@@ -12,7 +12,7 @@ class SimpleChatService:
     
     def __init__(self):
         # Hardcoded API key as requested
-        self.api_key = "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"
+        self.api_key = ""
         import os
         os.environ["OPENAI_API_KEY"] = self.api_key
         self.client = OpenAI()
