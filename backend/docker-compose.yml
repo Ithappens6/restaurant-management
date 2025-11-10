@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restaurant-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Server Configuration
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+      
+      # OpenAI Configuration (set your actual key here or use .env file)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=gpt-4o-mini
+      
+      # SendGrid Configuration
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - SENDGRID_FROM_EMAIL=${SENDGRID_FROM_EMAIL:-noreply@restaurant.com}
+      - SENDGRID_FROM_NAME=${SENDGRID_FROM_NAME:-Restaurant}
+      - RESTAURANT_NOTIFICATION_EMAIL=${RESTAURANT_NOTIFICATION_EMAIL:-admin@restaurant.com}
+      
+      # Database Configuration
+      - DATABASE_URL=sqlite:////app/data/restaurant.db
+      
+      # Restaurant Information
+      - RESTAURANT_NAME=${RESTAURANT_NAME:-Kurdie's Curry}
+      - RESTAURANT_ADDRESS=${RESTAURANT_ADDRESS:-1337 N Spice Rd, Prescott Valley, AZ 86314}
+      - RESTAURANT_PHONE=${RESTAURANT_PHONE:-(928) 555-1337}
+    volumes:
+      # Persist database
+      - ./data:/app/data
+      # Mount .env file (optional - if you prefer file-based config)
+      # - ./.env:/app/.env:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+# Optional: Add a volume for persistent database storage
+volumes:
+  db_data:
+
